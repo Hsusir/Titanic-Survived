@@ -1,21 +1,28 @@
 ---
-title: "¦pªG§A·f¤W¤FÅK¹F¥§¸¹¡A¦³¾÷·|¥ÍÁÙ¶Ü?"
-author: "³\sir"
-output: html_document
+title: "å¦‚æœä½ æ­ä¸Šäº†éµé”å°¼è™Ÿï¼Œæœ‰æ©Ÿæœƒç”Ÿé‚„å—?"
+author: "è¨±sir"
+
 ---
+```{}
+è‰™ç­‰ã€æ€§åˆ¥ã€å¹´é½¡åˆ°åº•å“ªå€‹å› ç´ æ‰æ˜¯é—œéµ? æœ‰è¦å‰‡å¯è©¢å—?
+```
 
-> ¿µµ¥¡B©Ê§O¡B¦~ÄÖ¨ì©³­ş­Ó¦]¯À¤~¬OÃöÁä? ¦³³W«h¥i¸ß¶Ü?
 
+### 1.è¨­å®šæ‰€éœ€çš„å‡½å¼åº«(libraries)ä»¥åŠè¼‰å…¥è³‡æ–™
+```{}
+install.packages("arules")
+install.packages("arulesViz")
+install.packages("grid")
 
-### 1.³]©w©Ò»İªº¨ç¦¡®w(libraries)¥H¤Î¸ü¤J¸ê®Æ
+```
+
 ```{r message=FALSE, warning=FALSE, results='hide'}
-setwd("D:/Rdata Practice")
-load("titanic.raw.RData")
-titanic<-titanic.raw
-str(titanic)
-
 library(arules)# find association rules with default settings
 
+setwd("/media/hsusir/DATA/Rdata Practice/09Algorithm/Titanic-Survived")
+load("./titanic.raw.rdata")
+titanic<-titanic.raw
+str(titanic)
 ```
 
 ### 2.rules with rhs containing "Survived" only
@@ -23,7 +30,7 @@ library(arules)# find association rules with default settings
 rules <- apriori(titanic)
 inspect(rules)
 
-#³o»ò¦h³W«h¡A¤£¤@©w¥ş³£¬O¦³¥Îªº¡C§Ú¥u·Q¬İ(¡§Survived=No¡¨, ¡§Survived=Yes¡¨)¦³Ãöªº
+#é€™éº¼å¤šè¦å‰‡ï¼Œä¸ä¸€å®šå…¨éƒ½æ˜¯æœ‰ç”¨çš„ã€‚æˆ‘åªæƒ³çœ‹(â€œSurvived=Noâ€, â€œSurvived=Yesâ€)æœ‰é—œçš„
 rules <- apriori(titanic,control = list(verbose=F),parameter = list(minlen=2, supp=0.005, conf=0.8),appearance = list(rhs=c("Survived=No","Survived=Yes"),default="lhs"))
 
 
@@ -33,7 +40,8 @@ inspect(rules.sorted)
 
 
 ```
-### 3.§A·|µo²{¦³¨Ç³W«h¦n¹³¦³­«½Æ©Ê(redundant rules)¡A©Ò¥H²{¦b§Ú­Ì­n±Æ°£redundant rules
+
+### 3.ä½ æœƒç™¼ç¾æœ‰äº›è¦å‰‡å¥½åƒæœ‰é‡è¤‡æ€§(redundant rules)ï¼Œæ‰€ä»¥ç¾åœ¨æˆ‘å€‘è¦æ’é™¤redundant rules
 ```{r message=FALSE, warning=FALSE}
 
 inspect(rules.sorted[1:2])
@@ -50,6 +58,7 @@ rules.pruned <- rules.sorted[!redundant]
 inspect(rules.pruned)
 
 ```
+
 ### 4.Rules about Children
 ```{r message=FALSE, warning=FALSE}
 rules <- apriori(titanic, control = list(verbose=F),
@@ -62,6 +71,7 @@ rules.sorted <- sort(rules, by="confidence")
 inspect(rules.sorted)
 
 ```
+
 ### 5.Visualizing Association Rules
 ```{r message=FALSE, warning=FALSE}
 library(arulesViz)
