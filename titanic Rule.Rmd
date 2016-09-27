@@ -1,0 +1,73 @@
+---
+title: "如果你搭上了鐵達尼號，有機會生還嗎?"
+author: "許sir"
+output: html_document
+---
+
+> 艙等、性別、年齡到底哪個因素才是關鍵? 有規則可詢嗎?
+
+
+### 1.設定所需的函式庫(libraries)以及載入資料
+```{r message=FALSE, warning=FALSE, results='hide'}
+setwd("D:/Rdata Practice")
+load("titanic.raw.RData")
+titanic<-titanic.raw
+str(titanic)
+
+library(arules)# find association rules with default settings
+
+```
+
+### 2.rules with rhs containing "Survived" only
+```{r message=FALSE, warning=FALSE}
+rules <- apriori(titanic)
+inspect(rules)
+
+#這麼多規則，不一定全都是有用的。我只想看(“Survived=No”, “Survived=Yes”)有關的
+rules <- apriori(titanic,control = list(verbose=F),parameter = list(minlen=2, supp=0.005, conf=0.8),appearance = list(rhs=c("Survived=No","Survived=Yes"),default="lhs"))
+
+
+quality(rules) <- round(quality(rules), digits=3)
+rules.sorted <- sort(rules, by="lift")
+inspect(rules.sorted)
+
+
+```
+### 3.你會發現有些規則好像有重複性(redundant rules)，所以現在我們要排除redundant rules
+```{r message=FALSE, warning=FALSE}
+
+inspect(rules.sorted[1:2])
+## find redundant rules
+subset.matrix <- is.subset(rules.sorted, rules.sorted)
+subset.matrix[lower.tri(subset.matrix, diag = T)] <- NA
+redundant <- colSums(subset.matrix, na.rm = T) >= 1
+
+## which rules are redundant
+which(redundant)
+
+## remove redundant rules
+rules.pruned <- rules.sorted[!redundant]
+inspect(rules.pruned)
+
+```
+### 4.Rules about Children
+```{r message=FALSE, warning=FALSE}
+rules <- apriori(titanic, control = list(verbose=F),
+parameter = list(minlen=3, supp=0.002, conf=0.2),
+appearance = list(default="none", rhs=c("Survived=Yes"),
+lhs=c("Class=1st", "Class=2nd", "Class=3rd",
+"Age=Child", "Age=Adult")))
+
+rules.sorted <- sort(rules, by="confidence")
+inspect(rules.sorted)
+
+```
+### 5.Visualizing Association Rules
+```{r message=FALSE, warning=FALSE}
+library(arulesViz)
+plot(rules)
+plot(rules, method="graph", control=list(type="items"))
+plot(rules, method="paracoord", control=list(reorder=TRUE))
+
+```
+
